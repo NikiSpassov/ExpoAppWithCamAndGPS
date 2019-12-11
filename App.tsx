@@ -1,21 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import CameraExample from './src/components/CameraExample';
+import POCApp from './src/components/POCApp';
 
 export default function App() {
-  return (
-    // <View style={styles.container}>
-    //   <Text>Open up App.tsx to start working on your app.</Text>
-    // </View>
-    <CameraExample/>
-  );
+	return (
+		<POCApp/>
+	);
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
