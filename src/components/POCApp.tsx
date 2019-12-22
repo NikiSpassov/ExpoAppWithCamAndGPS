@@ -4,12 +4,15 @@ import CameraHandler from "./CameraHandler";
 import { CapturedPicture } from "expo-camera/build/Camera.types";
 import * as Location from "expo-location";
 import LocationService from "../services/LocationService";
+import Login from "./Login";
 
 export interface POCAppState {
     photo: CapturedPicture,
     cameraMode: boolean,
     loadingLocation: boolean,
-    location: Location.LocationData
+    location: Location.LocationData,
+    showLoginControls: boolean,
+    loginInfo: string,
 }
 export interface POCAppProps {}
 
@@ -20,7 +23,9 @@ export default class POCApp extends React.Component<POCAppProps, POCAppState> {
             photo: undefined,
             cameraMode: false,
             loadingLocation: false,
-            location: undefined
+            location: undefined,
+            showLoginControls: false,
+            loginInfo: undefined
         }
     }
 
@@ -47,17 +52,39 @@ export default class POCApp extends React.Component<POCAppProps, POCAppState> {
          });
     }
 
-    public render = (): ReactNode => {
-        const { cameraMode, photo, location, loadingLocation } = this.state;
+    private showLogin = () => {
+        this.setState({
+            showLoginControls: true
+        });
+    }
 
-        return (
-            <View style={this.styles.container}>
+    private getMessageFromLogin = (message: string) => {
+        this.setState({
+            showLoginControls: false,
+            loginInfo: message,
+        });
+    }
+
+    public render = (): ReactNode => {
+        const { cameraMode, photo, location, loadingLocation, showLoginControls, loginInfo } = this.state;
+
+        if (cameraMode)
+            return (<View style={this.styles.container}>
                 {cameraMode && 
                     <CameraHandler
                         onPictureTaken={this.getPictureFromCamera}
                     />}
+                    </View>);
+        
+        if (showLoginControls)
+            return ( <View style={this.styles.container}>
+                {showLoginControls && 
+                    <Login
+                        getMessageFromLogin={this.getMessageFromLogin}
+                />}</View>);
 
-                {!cameraMode &&
+        return (
+            <View style={this.styles.container}>
                 <View style={this.styles.controls}>
                     <View style={this.styles.cameraButton} >
                         <Button onPress={this.cameraOn} title="Camera"/>
@@ -68,7 +95,11 @@ export default class POCApp extends React.Component<POCAppProps, POCAppState> {
                     </View>
                     {loadingLocation && <ActivityIndicator />}
                     {!!location && <Text>{ JSON.stringify(location) }</Text>}
-                </View> }
+                    <View style={this.styles.loginButton} >
+                        <Button onPress={this.showLogin} title="Login"/>
+                    </View>
+                    {!!loginInfo && <Text>{ loginInfo }</Text>}
+                </View>
             </View>
         );
     }
@@ -93,6 +124,10 @@ export default class POCApp extends React.Component<POCAppProps, POCAppState> {
             marginBottom: 20
         },
         locationButton: {
+            marginTop: 20,
+            marginBottom: 20
+        },
+        loginButton: {
             marginTop: 20,
             marginBottom: 20
         },
